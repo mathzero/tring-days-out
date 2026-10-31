@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Things to do near Tring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --bg: #f7f5f0; --panel: #ffffff; --fg: #1f1d1a; --muted: #6b665e; --line: #e4e0d7;
+  --ok: #2f7d4f; --warn: #b7791f; --chip: #ffffff;
+  --c0: #3a7d44; --c1: #3b6fb6; --c2: #b8742a; --c3: #8a8580;
+  --grid: #ece8df; --tip: #ffffff; --shadow: 0 6px 24px rgba(0,0,0,.12);
+  --serif: "Fraunces", Georgia, serif; --sans: "Inter", system-ui, -apple-system, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171614; --panel: #201f1c; --fg: #f1eee8; --muted: #a39d93; --line: #34312c;
+    --ok: #6cc28c; --warn: #e0a84e; --chip: #201f1c;
+    --c0: #6cbf79; --c1: #79a6e6; --c2: #e0a35c; --c3: #8f8a84;
+    --grid: #2b2925; --tip: #2a2825; --shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; display: flex; flex-direction: column; gap: 20px; }
+h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 5vw, 40px); margin: 0; line-height: 1.1; }
+.take { margin: 6px 0 0; font-size: 17px; }
+.take b { font-weight: 600; }
+.sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+h2 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+h2 .range { color: var(--muted); font-weight: 400; }
+.note { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
+.kids { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; }
+.kid { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.kid input[type=range] { width: 150px; accent-color: var(--fg); }
+.kid input[type=range]:disabled { opacity: .35; }
+.kid output { min-width: 52px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.kid label, .both { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.both { font-size: 14px; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; }
+.tile .lab { font-size: 13px; color: var(--muted); }
+.tile .num { font-family: var(--serif); font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .nt { font-size: 12px; color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 13px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--chip); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.sel { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.sel select { font: inherit; font-size: 13px; color: var(--fg); background: var(--chip); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
+.now { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 12px; }
+.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.item { border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; background: var(--bg); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+.item .nm { font-weight: 600; }
+.item .nm a { color: var(--fg); }
+.item .on { font-size: 12px; font-weight: 600; white-space: nowrap; align-self: start; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--line); }
+.item .on.today { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.item .meta { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+.item .why { grid-column: 1 / -1; font-size: 13px; }
+.badge { grid-column: 1 / -1; justify-self: start; font-size: 12px; padding: 0 9px; border-radius: 999px; background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.empty { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.timeline { position: relative; min-height: 60px; }
+.timeline svg { display: block; }
+.timeline .tick text { fill: var(--muted); font-size: 12px; }
+.timeline .tick line { stroke: var(--grid); }
+.timeline .lab { fill: var(--fg); font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--tip); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 6px 10px; font-size: 12px; max-width: 260px; z-index: 3; }
+.tip .m { color: var(--muted); }
+.scroll { max-height: 640px; overflow: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { position: sticky; top: 0; background: var(--panel); text-align: left; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; z-index: 1; }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td a { color: var(--fg); }
+td.nm { font-weight: 600; min-width: 160px; }
+td.why { min-width: 220px; color: var(--muted); }
+.sort { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+tr.wkd td { background: color-mix(in srgb, var(--ok) 9%, transparent); }
+tr.wkd td:first-child { box-shadow: inset 3px 0 0 var(--ok); }
+.keyrow { display: inline-block; width: 12px; height: 12px; border-radius: 2px; background: color-mix(in srgb, var(--ok) 25%, transparent); box-shadow: inset 3px 0 0 var(--ok); vertical-align: middle; margin-right: 4px; }
+.fitbar { display: inline-block; height: 6px; border-radius: 2px; background: var(--c3); opacity: .5; margin-right: 6px; vertical-align: middle; }
+.fitbar.hi { background: var(--ok); opacity: 1; }
+footer { font-size: 12px; color: var(--muted); }
+.loading { color: var(--muted); font-size: 14px; }
+@media (max-width: 760px) { .hide-sm { display: none; } .kid input[type=range] { width: 120px; } }
+@media (max-width: 1080px) { .hide-md { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Things to do near Tring</h1>
+    <p class="take" id="take">Loading what's on…</p>
+    <p class="sub">For little ones, updated every Wednesday. Last checked <span id="checked">—</span>. Drive times are rough, from central Tring. Always check with the venue before setting off.</p>
+  </header>
+
+  <section class="panel kids" aria-label="Children's ages">
+    <div class="kid">
+      <label><input type="checkbox" id="k1on" checked> Older child</label>
+      <input type="range" id="k1" min="0" max="12" step="0.5" value="3.5" aria-label="Older child's age in years">
+      <output id="k1out">3½ yrs</output>
+    </div>
+    <div class="kid">
+      <label><input type="checkbox" id="k2on" checked> Younger child</label>
+      <input type="range" id="k2" min="0" max="12" step="0.5" value="2" aria-label="Younger child's age in years">
+      <output id="k2out">2 yrs</output>
+    </div>
+    <label class="both"><input type="checkbox" id="both"> Only show things that suit both</label>
+  </section>
+
+  <section class="tiles">
+    <div class="tile"><div class="lab">This weekend</div><div class="num" id="t-wkd">—</div><div class="nt">things on</div></div>
+    <div class="tile"><div class="lab">Next four weeks</div><div class="num" id="t-up">—</div><div class="nt">dated events on</div></div>
+    <div class="tile"><div class="lab">Free</div><div class="num" id="t-free">—</div><div class="nt">options on the list</div></div>
+    <div class="tile"><div class="lab">Wet-day options</div><div class="num" id="t-in">—</div><div class="nt">fully indoors</div></div>
+  </section>
+
+  <section class="filters" aria-label="Filters">
+    <div class="group" role="group" aria-label="Indoor or outdoor">
+      <button class="chip" data-p="setting" data-v="all">All</button>
+      <button class="chip" data-p="setting" data-v="Outdoor">Outdoor</button>
+      <button class="chip" data-p="setting" data-v="Indoor">Indoor (wet day)</button>
+      <button class="chip" data-p="setting" data-v="Mixed">Mixed</button>
+    </div>
+    <label class="sel">Drive
+      <select id="drive" aria-label="Maximum drive time">
+        <option value="0">Any distance</option>
+        <option value="10">Up to 10 min</option>
+        <option value="20">Up to 20 min</option>
+        <option value="30">Up to 30 min</option>
+      </select>
+    </label>
+    <div class="group" role="group" aria-label="Kind of activity">
+      <button class="chip" data-p="cat" data-v="all">Everything</button>
+      <button class="chip" data-p="cat" data-v="Outdoors">Outdoors</button>
+      <button class="chip" data-p="cat" data-v="Animals">Animals</button>
+      <button class="chip" data-p="cat" data-v="Books &amp; stories">Books &amp; stories</button>
+      <button class="chip" data-p="cat" data-v="Arts &amp; crafts">Arts &amp; crafts</button>
+      <button class="chip" data-p="cat" data-v="Theatre">Theatre</button>
+      <button class="chip" data-p="cat" data-v="Sport">Sport</button>
+      <button class="chip" data-p="cat" data-v="Festive">Festive</button>
+    </div>
+  </section>
+
+  <section class="now">
+    <div class="panel">
+      <h2>This weekend <span class="range" id="r-wkd"></span></h2>
+      <p class="note">Best fit first, including regular things that run at weekends.</p>
+      <ul class="items" id="l-wkd"></ul>
+      <p class="empty" id="e-wkd" hidden>Nothing on the list this weekend with these settings: a good weekend for an old favourite.</p>
+    </div>
+    <div class="panel">
+      <h2>Weekdays <span class="range" id="r-wd"></span></h2>
+      <p class="note">Mornings and drop-ins for the days around nursery.</p>
+      <ul class="items" id="l-wd"></ul>
+      <p class="empty" id="e-wd" hidden>Nothing on these weekdays with these settings.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>What's on when: next nine weeks</h2>
+    <p class="note">Dated events only. The shaded band is the coming weekend. Hover or tap a bar for details.</p>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--c0)"></i>Outdoor</span>
+      <span><i class="sw" style="background:var(--c1)"></i>Indoor</span>
+      <span><i class="sw" style="background:var(--c2)"></i>Mixed</span>
+    </div>
+    <div class="timeline" id="timeline"></div>
+    <p class="empty" id="e-tl" hidden>No dated events match these settings.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Everything on the list</h2>
+    <p class="note">Fit /10 is an estimate for small children who like outdoors, arty things, books and sport. <span class="keyrow"></span>On this weekend. Tap a column name to sort.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th data-col="when" aria-sort="ascending"><button class="sort" data-sort="when">When</button></th>
+          <th data-col="name"><button class="sort" data-sort="name">What</button></th>
+          <th class="hide-sm">Where</th>
+          <th class="hide-md">Town</th>
+          <th class="n" data-col="drive_mins"><button class="sort" data-sort="drive_mins">Drive (min)</button></th>
+          <th>Cost</th>
+          <th class="hide-sm">Ages</th>
+          <th data-col="setting"><button class="sort" data-sort="setting">In / out</button></th>
+          <th class="n" data-col="fit"><button class="sort" data-sort="fit">Fit /10</button></th>
+          <th class="hide-md">Booking</th>
+          <th class="hide-sm">Why</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="e-list" hidden>Nothing matches these settings. Try a longer drive or Everything.</p>
+  </section>
+
+  <footer>Compiled weekly from venue and listings websites. Details change, so check before you go.</footer>
+</div>
+
+<script>
+(() => {
+  const TONE = {Outdoor: 'var(--c0)', Indoor: 'var(--c1)', Mixed: 'var(--c2)'};
+  const KIDS = {k1: 'Older child', k2: 'Younger child'};
+  const DEFAULTS = {setting: 'all', drive: 0, cat: 'all', k1: 3.5, k2: 2, k1on: true, k2on: true, both: false};
+  let P = Object.assign({}, DEFAULTS);
+  try { const s = JSON.parse(localStorage.getItem('tdo-settings') || 'null'); if (s && typeof s === 'object') P = Object.assign(P, s); } catch (e) {}
+  const save = () => { try { localStorage.setItem('tdo-settings', JSON.stringify(P)); } catch (e) {} };
+  let EVENTS = null;
+  let sortState = {key: 'when', dir: 1};
+  const $ = (id) => document.getElementById(id);
+
+  // ---- dates ----
+  const DAY = 864e5;
+  const todayUTC = () => { const n = new Date(); return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); };
+  const add = (d, k) => new Date(d.getTime() + k * DAY);
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const AB = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const fmt = (d, o) => d.toLocaleDateString('en-GB', Object.assign({timeZone: 'UTC'}, o));
+  const span = (a, b) => a.getTime() === b.getTime() ? fmt(a, {weekday: 'short', day: 'numeric', month: 'short'})
+    : fmt(a, {weekday: 'short', day: 'numeric'}) + (a.getUTCMonth() === b.getUTCMonth() ? '' : ' ' + fmt(a, {month: 'short'})) + ' – ' + fmt(b, {weekday: 'short', day: 'numeric', month: 'short'});
+  function windowDays() {
+    const t = todayUTC(), dow = t.getUTCDay();
+    const sat = dow === 6 ? t : dow === 0 ? add(t, -1) : add(t, 6 - dow);
+    const sun = add(sat, 1);
+    const wkd = [sat, sun].filter((d) => d >= t);
+    const wdFrom = dow >= 1 && dow <= 5 ? t : add(sun, 1);
+    const wdTo = dow >= 1 && dow <= 5 ? add(t, 5 - dow) : add(sun, 5);
+    const wd = []; for (let d = wdFrom; d <= wdTo; d = add(d, 1)) wd.push(d);
+    return {t, sat, sun, wkd, wd, wkdLabel: span(wkd[0], sun), wdLabel: span(wdFrom, wdTo)};
+  }
+  const runsOn = (e, d) => {
+    if (e.type === 'Date TBC') return false;
+    if (e.start && (iso(d) < e.start || iso(d) > (e.end || e.start))) return false;
+    if (!e.start && e.type === 'Dated') return false;
+    const days = String(e.days || '').trim();
+    return !days || days === 'Daily' || days.split(',').map((x) => x.trim()).includes(AB[d.getUTCDay()]);
+  };
+
+  // ---- ages & filters ----
+  const ageFmt = (v) => { const n = Number(v), w = Math.floor(n); return (n - w >= 0.5 ? (w ? w + '½' : '½') : String(w)) + ' yrs'; };
+  const suits = (e, a) => {
+    const mn = e.min_age == null || e.min_age === '' ? 0 : Number(e.min_age);
+    const mx = e.max_age == null || e.max_age === '' ? 99 : Number(e.max_age);
+    return a >= mn && Math.floor(a) <= mx;
+  };
+  const activeKids = () => ['k1', 'k2'].filter((k) => P[k + 'on']);
+  const who = (e) => activeKids().filter((k) => suits(e, Number(P[k])));
+  const onlyTag = (e) => { const a = activeKids(), w = who(e); return a.length > 1 && w.length === 1 ? KIDS[w[0]] + ' only' : ''; };
+  const matches = (e) => {
+    const a = activeKids(), w = who(e);
+    const ageOk = !a.length || (P.both && a.length > 1 ? w.length === a.length : w.length > 0);
+    return ageOk &&
+      (P.setting === 'all' || e.setting === P.setting) &&
+      (!Number(P.drive) || Number(e.drive_mins) <= Number(P.drive)) &&
+      (P.cat === 'all' || e.category === P.cat);
+  };
+  const live = () => { const ti = iso(todayUTC()); return EVENTS.filter((e) => !(e.end && e.end < ti)); };
+
+  // ---- controls ----
+  function syncControls() {
+    document.querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(P[b.dataset.p] === b.dataset.v)));
+    $('drive').value = String(Number(P.drive) || 0);
+    for (const k of ['k1', 'k2']) {
+      $(k).value = String(P[k]); $(k + 'out').value = ageFmt(P[k]);
+      $(k + 'on').checked = !!P[k + 'on']; $(k).disabled = !P[k + 'on'];
+      $(k + 'out').style.opacity = P[k + 'on'] ? 1 : .35;
+    }
+    $('both').checked = !!P.both; $('both').disabled = activeKids().length < 2;
+    $('both').parentElement.style.opacity = activeKids().length < 2 ? .45 : 1;
+  }
+  const set = (patch) => { Object.assign(P, patch); save(); syncControls(); render(); };
+  document.querySelectorAll('.chip').forEach((b) => b.addEventListener('click', () => set({[b.dataset.p]: b.dataset.v})));
+  $('drive').addEventListener('change', (e) => set({drive: Number(e.target.value)}));
+  for (const k of ['k1', 'k2']) {
+    $(k).addEventListener('input', (e) => { $(k + 'out').value = ageFmt(e.target.value); });
+    $(k).addEventListener('change', (e) => set({[k]: Number(e.target.value)}));
+    $(k + 'on').addEventListener('change', (e) => {
+      const patch = {[k + 'on']: e.target.checked};
+      const other = k === 'k1' ? 'k2on' : 'k1on';
+      if (!e.target.checked && !P[other]) patch[other] = true; // keep at least one child
+      set(patch);
+    });
+  }
+  $('both').addEventListener('change', (e) => set({both: e.target.checked}));
+  document.querySelectorAll('.sort').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.sort;
+    sortState = {key: k, dir: sortState.key === k ? -sortState.dir : (k === 'fit' ? -1 : 1)};
+    document.querySelectorAll('th[data-col]').forEach((th) => th.setAttribute('aria-sort', th.dataset.col === k ? (sortState.dir === 1 ? 'ascending' : 'descending') : 'none'));
+    renderTable();
+  }));
+
+  // ---- helpers ----
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = String(text); return n; };
+  const link = (e) => {
+    if (typeof e.url === 'string' && /^https:\/\//.test(e.url)) { const a = el('a', null, e.name); a.href = e.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+    return document.createTextNode(e.name);
+  };
+  const dot = (s) => { const d = el('span', 'dot'); d.style.background = TONE[s] || 'var(--c3)'; return d; };
+
+  // ---- render ----
+  function render() {
+    if (!EVENTS) return;
+    const W = windowDays();
+    const L = live();
+    // now lists
+    const nowRows = [];
+    for (const [bucket, set] of [['wkd', W.wkd], ['wd', W.wd]]) {
+      for (const e of L) {
+        const on = set.filter((d) => runsOn(e, d));
+        if (!on.length) continue;
+        const names = on.map((d) => (d.getTime() === W.t.getTime() ? 'Today' : AB[d.getUTCDay()]));
+        nowRows.push({e, bucket, today: on.some((d) => d.getTime() === W.t.getTime()),
+          on: bucket === 'wd' && on.length === 5 ? 'Every weekday' : names.join(bucket === 'wkd' || names.length <= 2 ? ' & ' : ', ')});
+      }
+    }
+    nowRows.sort((a, b) => Number(b.today) - Number(a.today) || b.e.fit - a.e.fit || a.e.drive_mins - b.e.drive_mins);
+    const wkdAll = nowRows.filter((r) => r.bucket === 'wkd' && matches(r.e));
+    $('r-wkd').textContent = W.wkdLabel; $('r-wd').textContent = W.wdLabel;
+    for (const b of ['wkd', 'wd']) {
+      const ul = $('l-' + b); ul.replaceChildren();
+      const rs = nowRows.filter((r) => r.bucket === b && matches(r.e));
+      rs.forEach((r) => {
+        const e = r.e, li = el('li', 'item');
+        const nm = el('div', 'nm'); nm.append(link(e));
+        const meta = el('div', 'meta'); meta.append(dot(e.setting), document.createTextNode(`${e.setting} · ${e.venue}, ${e.town} · ${e.drive_mins} min · ${e.cost} · fit ${e.fit}/10`));
+        li.append(nm, el('span', 'on' + (r.today ? ' today' : ''), r.on), el('div', 'meta', e.when), meta, el('div', 'why', e.why));
+        const tag = onlyTag(e); if (tag) li.append(el('span', 'badge', tag));
+        ul.append(li);
+      });
+      $('e-' + b).hidden = rs.length > 0;
+    }
+    // headline
+    const top = wkdAll[0];
+    const take = $('take'); take.replaceChildren();
+    if (wkdAll.length) {
+      take.append('This weekend: ', el('b', null, wkdAll.length), ` thing${wkdAll.length === 1 ? '' : 's'} on for your settings. Top pick: `, el('b', null, top.e.name), '.');
+    } else take.textContent = 'Nothing on the list this weekend for your settings.';
+    const ti = iso(W.t), hi = iso(add(W.t, 28));
+    const M = L.filter(matches);
+    $('t-wkd').textContent = wkdAll.length;
+    $('t-up').textContent = M.filter((e) => e.start && e.start <= hi && (e.end || e.start) >= ti).length;
+    $('t-free').textContent = M.filter((e) => e.free === true).length;
+    $('t-in').textContent = M.filter((e) => e.setting === 'Indoor').length;
+    window.__wkdIds = new Set(nowRows.filter((r) => r.bucket === 'wkd').map((r) => r.e.id));
+    renderTimeline(W, M);
+    renderTable();
+  }
+
+  function renderTable() {
+    const tb = $('rows'); tb.replaceChildren();
+    const rows = live().filter(matches);
+    const rank = {Dated: 0, Weekly: 1, Anytime: 2, 'Date TBC': 3};
+    const byWhen = (a, b) => (a.start ? 0 : 1) - (b.start ? 0 : 1) || (a.start || '').localeCompare(b.start || '') || (rank[a.type] ?? 9) - (rank[b.type] ?? 9) || b.fit - a.fit;
+    const cmp = {when: byWhen, name: (a, b) => a.name.localeCompare(b.name), drive_mins: (a, b) => a.drive_mins - b.drive_mins || byWhen(a, b),
+      fit: (a, b) => a.fit - b.fit || -byWhen(a, b), setting: (a, b) => a.setting.localeCompare(b.setting) || byWhen(a, b)}[sortState.key] || byWhen;
+    rows.sort((a, b) => sortState.dir * cmp(a, b)).forEach((e) => {
+      const tr = el('tr', window.__wkdIds && window.__wkdIds.has(e.id) ? 'wkd' : null);
+      const tag = onlyTag(e); if (tag) tr.title = tag;
+      const nm = el('td', 'nm'); nm.append(link(e));
+      const st = el('td'); st.append(dot(e.setting), document.createTextNode(e.setting));
+      const ft = el('td', 'n'); const fb = el('span', 'fitbar' + (e.fit >= 8 ? ' hi' : '')); fb.style.width = (e.fit * 4) + 'px'; ft.append(fb, document.createTextNode(e.fit));
+      tr.append(el('td', null, e.when), nm, el('td', 'hide-sm', e.venue), el('td', 'hide-md', e.town), el('td', 'n', e.drive_mins), el('td', null, e.cost),
+        el('td', 'hide-sm', e.ages), st, ft, el('td', 'hide-md', e.booking), el('td', 'why hide-sm', e.why));
+      tb.append(tr);
+    });
+    $('e-list').hidden = rows.length > 0;
+  }
+
+  function renderTimeline(W, M) {
+    const box = $('timeline'); box.replaceChildren();
+    const t0 = W.t, t1 = add(t0, 63);
+    const parse = d3.utcParse('%Y-%m-%d');
+    const items = M.filter((e) => e.start).map((e) => ({e, s: parse(e.start), f: parse(e.end || e.start)}))
+      .filter((d) => d.s && d.f && d.s <= t1 && d.f >= t0).sort((a, b) => a.s - b.s || b.e.fit - a.e.fit);
+    $('e-tl').hidden = items.length > 0;
+    if (!items.length) return;
+    const Wd = Math.max(280, box.clientWidth || 600), rowH = 26, top = 26, H = top + items.length * rowH + 6;
+    const labelW = Math.min(Math.round(Wd * 0.4), 250);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${Wd} ${H}`).attr('role', 'img').attr('aria-label', 'Timeline of dated events');
+    const x = d3.scaleUtc([t0, t1], [labelW, Wd - 8]);
+    const bx = x(W.wkd[0]), bx2 = x(add(W.sun, 1));
+    svg.append('rect').attr('x', bx).attr('y', top - 6).attr('width', Math.max(0, bx2 - bx)).attr('height', H - top + 6).attr('fill', 'var(--ok)').attr('opacity', .12);
+    const ax = svg.append('g').attr('transform', `translate(0,${top - 6})`)
+      .call(d3.axisTop(x).ticks(d3.utcMonday.every(Wd < 520 ? 2 : 1)).tickFormat(d3.utcFormat('%-d %b')).tickSize(-(H - top + 6)).tickPadding(6))
+      .attr('font-size', null).attr('font-family', null);
+    ax.select('.domain').remove();
+    let lastRight = -Infinity;
+    ax.selectAll('.tick').each(function () {
+      const tx = this.transform.baseVal.consolidate().matrix.e, t = this.querySelector('text'), w = t.getComputedTextLength();
+      if (tx - w / 2 < Math.max(lastRight + 6, labelW - 4) || tx + w / 2 > Wd) t.setAttribute('visibility', 'hidden'); else lastRight = tx + w / 2;
+    });
+    const tip = el('div', 'tip'); tip.hidden = true; box.append(tip);
+    items.forEach((d, i) => {
+      const y = top + i * rowH;
+      const lab = svg.append('text').attr('class', 'lab').attr('x', 0).attr('y', y + rowH / 2).attr('dy', '0.35em');
+      let txt = d.e.name; lab.text(txt);
+      while (lab.node().getComputedTextLength() > labelW - 10 && txt.length > 4) { txt = txt.slice(0, -2); lab.text(txt.trimEnd() + '…'); }
+      const xs = x(d.s < t0 ? t0 : d.s), xe = x(add(d.f > t1 ? t1 : d.f, 1));
+      const bar = svg.append('rect').attr('x', xs).attr('y', y + 5).attr('height', rowH - 10).attr('width', Math.max(6, Math.min(xe, Wd - 8) - xs)).attr('rx', 3)
+        .attr('fill', TONE[d.e.setting] || 'var(--c3)').style('cursor', 'pointer');
+      const show = (ev) => {
+        tip.replaceChildren(el('div', null, d.e.name), el('div', 'm', d.e.when), el('div', null, d.e.cost),
+          el('div', 'm', `${d.e.venue}, ${d.e.town} · ${d.e.drive_mins} min · fit ${d.e.fit}/10${onlyTag(d.e) ? ' · ' + onlyTag(d.e) : ''}`));
+        tip.firstChild.style.fontWeight = 600;
+        tip.hidden = false;
+        const r = box.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+        let lx = ev.clientX - r.left + 12, ly = ev.clientY - r.top + 12;
+        if (lx + tw > r.width) lx = Math.max(0, ev.clientX - r.left - tw - 12);
+        if (ly + th > r.height) ly = Math.max(0, ev.clientY - r.top - th - 12);
+        tip.style.left = lx + 'px'; tip.style.top = ly + 'px';
+        bar.attr('stroke', 'var(--fg)').attr('stroke-width', 1.5);
+      };
+      bar.on('mousemove', show).on('click', show).on('mouseleave', () => { tip.hidden = true; bar.attr('stroke', null); });
+    });
+  }
+
+  let lastW = 0;
+  window.addEventListener('resize', () => { const w = $('timeline').clientWidth; if (Math.abs(w - lastW) > 20) { lastW = w; render(); } });
+
+  syncControls();
+  fetch('events.json?v=' + Date.now(), {cache: 'no-store'}).then((r) => r.json()).then((data) => {
+    EVENTS = Array.isArray(data) ? data : (data.events || []);
+    const last = EVENTS.map((e) => e.checked).filter(Boolean).sort().pop();
+    $('checked').textContent = last ? new Date(last + 'T12:00:00Z').toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'}) : '—';
+    lastW = $('timeline').clientWidth;
+    render();
+  }).catch(() => { $('take').textContent = 'Couldn’t load the list just now. Try refreshing.'; });
+})();
+</script>
+</body>
+</html>
